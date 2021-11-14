@@ -5,30 +5,47 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const formEl = document.querySelector('#search-form');
 const galleryEl = document.querySelector('.gallery');
+const loadMoreBtnEl = document.querySelector('.load-more');
+let page = 1;
+const pageSize = 4;
+
+loadMoreBtnEl.classList.add('is-hidden');
 
 formEl.addEventListener('submit', onSearchSubmit);
+loadMoreBtnEl.addEventListener('click', onLoadMoreBtnClick);
 
 /*--------FUNCTIONS----------*/
 function onSearchSubmit(e) {
   e.preventDefault();
   galleryEl.innerHTML = '';
+  page = 1;
   getImages();
+  page += 1;
+}
+
+function onLoadMoreBtnClick(e) {
+  getImages();
+  page += 1;
 }
 
 function getImages() {
   const query = formEl.elements.searchQuery.value.trim();
-  fetchImages(query)
+  fetchImages(query, page, pageSize)
     .then(({ data }) => {
       if (data.hits.length === 0) {
         Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
+      } else {
+        renderGallery(data.hits);
+        loadMoreBtnEl.classList.remove('is-hidden');
+        const restOfImages = data.totalHits - (page - 1) * pageSize;
+        restOfImages < 1 && stopLoadMore();
       }
-      renderGallery(data.hits);
     })
     .catch(error => console.log(error));
 }
 
-function createMarkup(images) {
-  return images
+function renderGallery(images) {
+  const markup = images
     .map(image => {
       const { webformatURL, largeImageURL, tags, likes, views, comments, downloads } = image;
       return `<a class="gallery__link" href="${largeImageURL}">
@@ -54,9 +71,16 @@ function createMarkup(images) {
       </a>`;
     })
     .join('');
+
+  galleryEl.insertAdjacentHTML('beforeend', markup);
+  const gallery = new SimpleLightbox('.gallery a');
 }
 
-function renderGallery(images) {
-  galleryEl.insertAdjacentHTML('beforeend', createMarkup(images));
-  const gallery = new SimpleLightbox('.gallery a');
+function stopLoadMore() {
+  loadMoreBtnEl.classList.add('is-hidden');
+  galleryEl.insertAdjacentHTML(
+    'afterend',
+    `<p class="limit-reached"><span class="material-icons">info</span> We're sorry, but you've reached the end of search results!</p>`,
+  );
+  formEl.reset();
 }
