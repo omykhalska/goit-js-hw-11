@@ -1,15 +1,12 @@
 import { fetchImages } from './fetch_img.js';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-// import SimpleLightbox from 'simplelightbox';
-// import 'simplelightbox/dist/simple-lightbox.min.css';
-import '../css/styles.css';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const formEl = document.querySelector('#search-form');
 const galleryEl = document.querySelector('.gallery');
 
 formEl.addEventListener('submit', onSearchSubmit);
-
-// const gallery = new SimpleLightbox('.gallery a');
 
 /*--------FUNCTIONS----------*/
 function onSearchSubmit(e) {
@@ -34,9 +31,11 @@ function createMarkup(images) {
   return images
     .map(image => {
       const { webformatURL, largeImageURL, tags, likes, views, comments, downloads } = image;
-      return `<div class="photo-card">
-      <a href="${largeImageURL}">
-          <img src="${webformatURL}" alt="${tags}" loading="lazy" width="300"/>
+      return `<a class="gallery__link" href="${largeImageURL}">
+      <div class="photo-card">
+          <div class="photo-thumb">
+            <img class="photo" src="${webformatURL}" alt="${tags}" loading="lazy"/>
+          </div>
           <div class="info">
             <p class="info-item">
               <b>Likes</b> ${likes}
@@ -51,12 +50,13 @@ function createMarkup(images) {
               <b>Downloads</b> ${downloads}
             </p>
           </div>
-          </a>
-        </div>`;
+      </div>
+      </a>`;
     })
     .join('');
 }
 
 function renderGallery(images) {
   galleryEl.insertAdjacentHTML('beforeend', createMarkup(images));
+  const gallery = new SimpleLightbox('.gallery a');
 }

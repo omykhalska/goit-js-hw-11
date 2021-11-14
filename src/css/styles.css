@@ -11,21 +11,15 @@ body {
   line-height: 1.5;
 }
 
-h1,
-ul,
-li,
 p {
   margin: 0;
 }
 
-img {
-  max-width: 100%;
+.photo {
   display: block;
-}
-
-ul {
-  padding: 0;
-  list-style: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 a {
@@ -75,19 +69,26 @@ a {
 .info {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-around;
 }
 .gallery {
-  justify-content: space-around;
   margin-top: -20px;
   margin-left: -20px;
-  padding-top: 20px;
+  padding: 20px;
 }
 
-.photo-card {
+.gallery__link {
   margin-top: 20px;
   margin-left: 20px;
+  min-width: 300px;
+  flex-basis: calc((100% - 80px) / 4);
   border: 2px solid rgb(241, 238, 238);
-  border-radius: 5px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.photo-thumb {
+  height: 33vh;
 }
 
 .info-item {
@@ -97,6 +98,10 @@ a {
   color: black;
 }
 
+.info-item:not(:first-child) {
+  margin-left: 5px;
+}
+
 .info {
-  justify-content: space-around;
+  padding: 10px;
 }
