@@ -7,7 +7,7 @@ const formEl = document.querySelector('#search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreBtnEl = document.querySelector('.load-more');
 let page = 1;
-const pageSize = 4;
+const pageSize = 40;
 
 loadMoreBtnEl.classList.add('is-hidden');
 
