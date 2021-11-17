@@ -6,13 +6,16 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 const formEl = document.querySelector('#search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreBtnEl = document.querySelector('.load-more');
+// let maxImgCount = document.querySelector('.sl-total');
+let gallery;
+
 let page = 1;
 const pageSize = 40;
 
 loadMoreBtnEl.classList.add('is-hidden');
 
 formEl.addEventListener('submit', onSearchSubmit);
-loadMoreBtnEl.addEventListener('click', makeRequest);
+loadMoreBtnEl.addEventListener('click', onLoadMoreBtnClick);
 
 /*--------FUNCTIONS----------*/
 function onSearchSubmit(e) {
@@ -20,6 +23,11 @@ function onSearchSubmit(e) {
   page = 1;
   document.querySelector('.limit-reached')?.remove();
   galleryEl.innerHTML = '';
+  makeRequest();
+}
+
+function onLoadMoreBtnClick() {
+  gallery.destroy();
   makeRequest();
 }
 
@@ -78,7 +86,7 @@ function renderGallery(images) {
     .join('');
 
   galleryEl.insertAdjacentHTML('beforeend', markup);
-  const gallery = new SimpleLightbox('.gallery a');
+  gallery = new SimpleLightbox('.gallery a');
 }
 
 function stopLoadMore() {
