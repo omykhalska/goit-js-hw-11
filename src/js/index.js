@@ -18,6 +18,7 @@ loadMoreBtnEl.addEventListener('click', makeRequest);
 function onSearchSubmit(e) {
   e.preventDefault();
   page = 1;
+  document.querySelector('.limit-reached')?.remove();
   galleryEl.innerHTML = '';
   makeRequest();
 }
@@ -83,7 +84,7 @@ function renderGallery(images) {
 function stopLoadMore() {
   loadMoreBtnEl.classList.add('is-hidden');
   galleryEl.insertAdjacentHTML(
-    'beforeend',
+    'afterend',
     `<p class="limit-reached"><span class="material-icons">info</span> We're sorry, but you've reached the end of search results!</p>`,
   );
   formEl.reset();
