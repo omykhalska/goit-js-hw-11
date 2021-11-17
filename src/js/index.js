@@ -1,4 +1,5 @@
 import { fetchImages } from './services/api.js';
+import { trackScroll, backToTop, scrollGallery } from './scrolling.js';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
@@ -6,17 +7,17 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 const formEl = document.querySelector('#search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreBtnEl = document.querySelector('.load-more-btn');
-const goTopBtn = document.querySelector('.back-to-top');
 let gallery;
 let page = 1;
 const pageSize = 40;
 
-loadMoreBtnEl.classList.add('is-hidden');
-
 formEl.addEventListener('submit', onSearchSubmit);
 loadMoreBtnEl.addEventListener('click', onLoadMoreBtnClick);
-window.addEventListener('scroll', trackScroll);
-goTopBtn.addEventListener('click', backToTop);
+
+loadMoreBtnEl.classList.add('is-hidden');
+
+trackScroll();
+backToTop();
 
 /*--------FUNCTIONS----------*/
 function onSearchSubmit(e) {
@@ -24,15 +25,15 @@ function onSearchSubmit(e) {
   page = 1;
   document.querySelector('.limit-reached')?.remove();
   galleryEl.innerHTML = '';
-  makeRequest();
+  createGallery();
 }
 
 function onLoadMoreBtnClick() {
   gallery.destroy();
-  makeRequest();
+  createGallery();
 }
 
-function makeRequest() {
+function createGallery() {
   loadMoreBtnEl.classList.add('is-hidden');
   getImages();
   page += 1;
@@ -55,7 +56,7 @@ function getImages() {
 
           renderGallery(data.hits);
 
-          if (page > 2) scrollGallery();
+          page > 2 && scrollGallery(galleryEl);
 
           loadMoreBtnEl.classList.remove('is-hidden');
 
@@ -106,33 +107,4 @@ function stopLoadMore() {
     `<p class="limit-reached"><span class="material-icons">info</span> We're sorry, but you've reached the end of search results!</p>`,
   );
   formEl.reset();
-}
-
-function scrollGallery() {
-  const cardHeight = document
-    .querySelector('.gallery')
-    .firstElementChild.getBoundingClientRect().height;
-
-  window.scrollBy({
-    top: cardHeight * 2,
-    behavior: 'smooth',
-  });
-}
-
-function trackScroll() {
-  const scrolled = window.pageYOffset;
-  const coords = document.documentElement.clientHeight;
-
-  if (scrolled > coords) {
-    goTopBtn.classList.add('back-to-top-show');
-  }
-  if (scrolled < coords) {
-    goTopBtn.classList.remove('back-to-top-show');
-  }
-}
-
-function backToTop() {
-  if (window.pageYOffset > 0) {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
 }
