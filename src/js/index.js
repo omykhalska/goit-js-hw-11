@@ -1,4 +1,4 @@
-import { fetchImages } from './fetch_img.js';
+import { fetchImages } from './services/api.js';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
@@ -12,36 +12,40 @@ const pageSize = 40;
 loadMoreBtnEl.classList.add('is-hidden');
 
 formEl.addEventListener('submit', onSearchSubmit);
-loadMoreBtnEl.addEventListener('click', onLoadMoreBtnClick);
+loadMoreBtnEl.addEventListener('click', makeRequest);
 
 /*--------FUNCTIONS----------*/
 function onSearchSubmit(e) {
   e.preventDefault();
-  galleryEl.innerHTML = '';
   page = 1;
-  getImages();
-  page += 1;
+  galleryEl.innerHTML = '';
+  makeRequest();
 }
 
-function onLoadMoreBtnClick(e) {
+function makeRequest() {
+  loadMoreBtnEl.classList.add('is-hidden');
   getImages();
   page += 1;
 }
 
 function getImages() {
   const query = formEl.elements.searchQuery.value.trim();
-  fetchImages(query, page, pageSize)
-    .then(({ data }) => {
-      if (data.hits.length === 0) {
-        Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
-      } else {
-        renderGallery(data.hits);
-        loadMoreBtnEl.classList.remove('is-hidden');
-        const restOfImages = data.totalHits - (page - 1) * pageSize;
-        restOfImages < 1 && stopLoadMore();
-      }
-    })
-    .catch(error => console.log(error));
+  if (query !== '') {
+    fetchImages(query, page, pageSize)
+      .then(({ data }) => {
+        if (data.hits.length === 0) {
+          Notify.failure(
+            `Sorry, there are no images matching your search query. Please try again.`,
+          );
+        } else {
+          renderGallery(data.hits);
+          loadMoreBtnEl.classList.remove('is-hidden');
+          const restOfImages = data.totalHits - (page - 1) * pageSize;
+          restOfImages < 1 && stopLoadMore();
+        }
+      })
+      .catch(error => console.log(error));
+  }
 }
 
 function renderGallery(images) {
@@ -79,7 +83,7 @@ function renderGallery(images) {
 function stopLoadMore() {
   loadMoreBtnEl.classList.add('is-hidden');
   galleryEl.insertAdjacentHTML(
-    'afterend',
+    'beforeend',
     `<p class="limit-reached"><span class="material-icons">info</span> We're sorry, but you've reached the end of search results!</p>`,
   );
   formEl.reset();
