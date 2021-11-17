@@ -47,6 +47,7 @@ function getImages() {
             `Sorry, there are no images matching your search query. Please try again.`,
           );
         } else {
+          notifySearchResult(data.totalHits);
           renderGallery(data.hits);
           loadMoreBtnEl.classList.remove('is-hidden');
           const restOfImages = data.totalHits - (page - 1) * pageSize;
@@ -96,4 +97,10 @@ function stopLoadMore() {
     `<p class="limit-reached"><span class="material-icons">info</span> We're sorry, but you've reached the end of search results!</p>`,
   );
   formEl.reset();
+}
+
+function notifySearchResult(quantity) {
+  if (page === 2) {
+    Notify.info(`Hooray! We found ${quantity} images.`);
+  }
 }
