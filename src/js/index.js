@@ -5,10 +5,9 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const formEl = document.querySelector('#search-form');
 const galleryEl = document.querySelector('.gallery');
-const loadMoreBtnEl = document.querySelector('.load-more');
-// let maxImgCount = document.querySelector('.sl-total');
+const loadMoreBtnEl = document.querySelector('.load-more-btn');
+const goTopBtn = document.querySelector('.back-to-top');
 let gallery;
-
 let page = 1;
 const pageSize = 40;
 
@@ -16,6 +15,8 @@ loadMoreBtnEl.classList.add('is-hidden');
 
 formEl.addEventListener('submit', onSearchSubmit);
 loadMoreBtnEl.addEventListener('click', onLoadMoreBtnClick);
+window.addEventListener('scroll', trackScroll);
+goTopBtn.addEventListener('click', backToTop);
 
 /*--------FUNCTIONS----------*/
 function onSearchSubmit(e) {
@@ -39,6 +40,7 @@ function makeRequest() {
 
 function getImages() {
   const query = formEl.elements.searchQuery.value.trim();
+
   if (query !== '') {
     fetchImages(query, page, pageSize)
       .then(({ data }) => {
@@ -47,9 +49,16 @@ function getImages() {
             `Sorry, there are no images matching your search query. Please try again.`,
           );
         } else {
-          notifySearchResult(data.totalHits);
+          if (page === 2) {
+            Notify.success(`Hooray! We found ${data.totalHits} images.`);
+          }
+
           renderGallery(data.hits);
+
+          if (page > 2) scrollGallery();
+
           loadMoreBtnEl.classList.remove('is-hidden');
+
           const restOfImages = data.totalHits - (page - 1) * pageSize;
           restOfImages < 1 && stopLoadMore();
         }
@@ -99,8 +108,31 @@ function stopLoadMore() {
   formEl.reset();
 }
 
-function notifySearchResult(quantity) {
-  if (page === 2) {
-    Notify.info(`Hooray! We found ${quantity} images.`);
+function scrollGallery() {
+  const cardHeight = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect().height;
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
+}
+
+function trackScroll() {
+  const scrolled = window.pageYOffset;
+  const coords = document.documentElement.clientHeight;
+
+  if (scrolled > coords) {
+    goTopBtn.classList.add('back-to-top-show');
+  }
+  if (scrolled < coords) {
+    goTopBtn.classList.remove('back-to-top-show');
+  }
+}
+
+function backToTop() {
+  if (window.pageYOffset > 0) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
