@@ -39,7 +39,9 @@ function createGallery() {
 
 function getImages() {
   const query = formEl.elements.searchQuery.value.trim();
+
   if (query === '') {
+    Notify.info(`The search string cannot be empty. Please specify your search query.`);
     return;
   }
 
